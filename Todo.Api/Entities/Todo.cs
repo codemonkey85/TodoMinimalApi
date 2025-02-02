@@ -11,7 +11,7 @@ public record TodoItem
 
     [Required]
     [StringLength(100)]
-    public string? Name { get; set; }
+    public string Name { get; set; } = default!;
 
     [Required]
     public bool IsComplete { get; set; } = false;

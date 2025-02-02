@@ -1,7 +1,9 @@
 ﻿namespace Todo.Api.Entities.DTO.Todo;
 
-public class ListTodos
+public class ListTodos(List<TodoItemDTO> todos, int totalCount)
 {
-    public List<TodoItemDTO> Todos { get; set; } = [];
-    public int TotalCount { get; set; }  
+    public ListTodos() : this([], 0)
+    { }
+    public List<TodoItemDTO> Todos { get; set; } = todos;
+    public int TotalCount { get; set; } = totalCount;
 }
