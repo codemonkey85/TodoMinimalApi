@@ -1,4 +1,5 @@
 using AspNetCore.Swagger.Themes;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Todo.Api.Data;
@@ -42,6 +43,16 @@ try
         {
             options.SwaggerEndpoint("/openapi/v1/openapi.json", "Todo API");
         });
+
+#if DEBUG
+        bool seed = app.Configuration.GetValue<bool>("seed");
+        if (seed)
+        {
+            using IServiceScope? scope = app.Services.CreateScope();
+            using DataContext context = scope.ServiceProvider.GetRequiredService<DataContext>();
+            DbInit.Seed(context);
+        }
+#endif
     }
 
     app.UseHttpsRedirection();
