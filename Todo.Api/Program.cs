@@ -1,8 +1,10 @@
 using AspNetCore.Swagger.Themes;
-using Microsoft.AspNetCore.Identity;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Reflection;
 using Todo.Api.Data;
+using Todo.Api.Helpers;
 using Todo.Api.Middleware;
 
 Log.Logger = new LoggerConfiguration().CreateBootstrapLogger();
@@ -26,6 +28,9 @@ try
             options.EnableDetailedErrors();
         }
     });
+
+    // Fluent Validation
+    services.AddValidators();
 
     if (builder.Environment.IsDevelopment())
     {

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Todo.Api.Data;
 using Todo.Api.Entities;
 using Todo.Api.Entities.DTO.Todo;
+using Todo.Api.Entities.Validators;
 
 namespace Todo.Api.Endpoints;
 
@@ -46,10 +48,17 @@ public static class TodoEndpoints
         .Produces<TodoItemDTO>(200)
         .Produces(404);
 
-        group.MapPost("/", async Task<Results<Created, BadRequest>> (
+        group.MapPost("/", async Task<Results<Created<TodoItem>, ValidationProblem>> (
             [FromServices]DataContext context,
+            [FromServices]IValidator<AddTodo> validator,
             [FromBody]AddTodo model) =>
         {
+            var result = await validator.ValidateAsync(model);
+            if (!result.IsValid)
+            {
+                return TypedResults.ValidationProblem(result.ToDictionary());
+            }
+
             TodoItem newTodo = new()
             {
                 Name = model.Name!,
@@ -59,10 +68,10 @@ public static class TodoEndpoints
             context.Todos.Add(newTodo);
             await context.SaveChangesAsync();
             
-            return TypedResults.Created();
+            return TypedResults.Created($"{newTodo.Id}", newTodo);
         }).WithName("CreateTodoAsync")
           .Produces(201)
-          .Produces(401);
+          .ProducesValidationProblem();
 
         return app;
     }
