@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Todo.Api.Data;
+using Todo.Api.Entities;
 using Todo.Api.Entities.DTO.Todo;
 
 namespace Todo.Api.Endpoints;
@@ -44,6 +45,24 @@ public static class TodoEndpoints
         }).WithName("GetTodoAsync")
         .Produces<TodoItemDTO>(200)
         .Produces(404);
+
+        group.MapPost("/", async Task<Results<Created, BadRequest>> (
+            [FromServices]DataContext context,
+            [FromBody]AddTodo model) =>
+        {
+            TodoItem newTodo = new()
+            {
+                Name = model.Name!,
+                IsComplete = false
+            };
+
+            context.Todos.Add(newTodo);
+            await context.SaveChangesAsync();
+            
+            return TypedResults.Created();
+        }).WithName("CreateTodoAsync")
+          .Produces(201)
+          .Produces(401);
 
         return app;
     }
