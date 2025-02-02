@@ -73,6 +73,43 @@ public static class TodoEndpoints
           .Produces(201)
           .ProducesValidationProblem();
 
+        group.MapPut("/{id}", async Task<Results<Ok, NotFound, ValidationProblem, BadRequest<string>>> (
+            int id,
+            [FromServices]DataContext context,
+            [FromServices]IValidator<UpdateTodo> validator,
+            [FromBody]UpdateTodo model) =>
+        {
+            if (id != model.Id)
+            {
+                return TypedResults.BadRequest("ID Mismatch");
+            }
+
+            var result = await validator.ValidateAsync(model);
+
+            if (!result.IsValid)
+            {
+                return TypedResults.ValidationProblem(result.ToDictionary());
+            }
+
+            var dbTodo = await context.Todos.FindAsync(id);
+            if (dbTodo is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            dbTodo.Name = model.Name!;
+            dbTodo.IsComplete = model.IsComplete;
+
+            context.Entry(dbTodo).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+
+            return TypedResults.Ok();
+        }).WithName("UpdateTodoAsync")
+          .Produces(200)
+          .Produces(400)
+          .Produces(404)
+          .ProducesValidationProblem();
+
         return app;
     }
 }

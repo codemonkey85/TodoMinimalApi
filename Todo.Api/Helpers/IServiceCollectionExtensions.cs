@@ -9,6 +9,7 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddScoped<IValidator<AddTodo>, AddTodoValidator>();
+        services.AddScoped<IValidator<UpdateTodo>, UpdateTodoValidator>();
         return services;
     }
 }
