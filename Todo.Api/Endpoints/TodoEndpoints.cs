@@ -110,6 +110,23 @@ public static class TodoEndpoints
           .Produces(404)
           .ProducesValidationProblem();
 
+        group.MapDelete("/{id}", async Task<Results<Ok, NotFound>>
+            (int id, [FromServices]DataContext context) =>
+        {
+            var todo = await context.Todos.FindAsync(id);
+            if (todo is null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            context.Todos.Remove(todo);
+            await context.SaveChangesAsync();
+
+            return TypedResults.Ok();
+        }).WithName("DeleteTodoAsync")
+          .Produces(200)
+          .Produces(404);
+
         return app;
     }
 }
