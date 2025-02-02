@@ -1,5 +1,7 @@
 using AspNetCore.Swagger.Themes;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Todo.Api.Data;
 using Todo.Api.Middleware;
 
 Log.Logger = new LoggerConfiguration().CreateBootstrapLogger();
@@ -13,6 +15,17 @@ try
         .ReadFrom.Configuration(ctx.Configuration));
 
     // Add services to the container.
+    string connectionString = builder.Configuration.GetConnectionString("DataContext")
+        ?? throw new InvalidOperationException("Unable to retrieve ConnectionString: `DataContext`");
+    services.AddDbContext<DataContext>(options => 
+    {
+        options.UseSqlServer(connectionString);
+        if (builder.Environment.IsDevelopment())
+        {
+            options.EnableDetailedErrors();
+        }
+    });
+
     if (builder.Environment.IsDevelopment())
     {
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -37,8 +50,10 @@ try
 
     app.Run();
 }
-catch (Exception ex) when (ex is not HostAbortedException)
+catch (Exception ex)
 {
+    if (ex.GetType().Name.Equals("HostAbortedException", StringComparison.Ordinal))
+        throw;
     Log.Fatal(ex, "{exMessage}", ex.Message);
 }
 finally
