@@ -1,3 +1,4 @@
+using AspNetCore.Swagger.Themes;
 using Serilog;
 using Todo.Api.Middleware;
 
@@ -12,15 +13,22 @@ try
         .ReadFrom.Configuration(ctx.Configuration));
 
     // Add services to the container.
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    services.AddOpenApi();
+    if (builder.Environment.IsDevelopment())
+    {
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        services.AddOpenApi();
+    }
 
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
-        app.MapOpenApi();
+        app.MapOpenApi("/openapi/v1/openapi.json");
+        app.UseSwaggerUI(ModernStyle.Dark, options =>
+        {
+            options.SwaggerEndpoint("/openapi/v1/openapi.json", "Todo API");
+        });
     }
 
     app.UseHttpsRedirection();
