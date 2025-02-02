@@ -31,6 +31,20 @@ public static class TodoEndpoints
         }).WithName("GetTodosAsync")
           .Produces<ListTodos>(200);
 
+        group.MapGet("/{id}", async Task<Results<Ok<TodoItemDTO>, NotFound>> (int id, [FromServices] DataContext context) =>
+        {
+            var todo = await context.Todos.Select(s => new TodoItemDTO
+            {
+                Id = s.Id,
+                Name = s.Name,
+                IsComplete = s.IsComplete,
+            }).SingleOrDefaultAsync(s => s.Id == id);
+
+            return todo is not null ? TypedResults.Ok<TodoItemDTO>(todo) : TypedResults.NotFound();
+        }).WithName("GetTodoAsync")
+        .Produces<TodoItemDTO>(200)
+        .Produces(404);
+
         return app;
     }
 }
