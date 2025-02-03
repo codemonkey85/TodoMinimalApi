@@ -31,22 +31,17 @@ public static class TodoEndpoints
 
             var list = new ListTodos(todos, todos.Count);
             return TypedResults.Ok<ListTodos>(list);
-        }).WithName("GetTodosAsync")
-          .Produces<ListTodos>(200);
+        }).WithName("GetTodosAsync");
 
         group.MapGet("/{id}", async Task<Results<Ok<TodoItemDTO>, NotFound>> (int id, [FromServices] DataContext context) =>
         {
-            var todo = await context.Todos.Select(s => new TodoItemDTO
-            {
-                Id = s.Id,
-                Name = s.Name,
-                IsComplete = s.IsComplete,
-            }).SingleOrDefaultAsync(s => s.Id == id);
+            var todo = await GetTodoAsync(id, context);
 
-            return todo is not null ? TypedResults.Ok<TodoItemDTO>(todo) : TypedResults.NotFound();
-        }).WithName("GetTodoAsync")
-        .Produces<TodoItemDTO>(200)
-        .Produces(404);
+            return todo is not null
+                ? TypedResults.Ok<TodoItemDTO>(todo)
+                : TypedResults.NotFound();
+
+        }).WithName("GetAsync");
 
         group.MapPost("/", async Task<Results<Created<TodoItem>, ValidationProblem>> (
             [FromServices]DataContext context,
@@ -104,11 +99,7 @@ public static class TodoEndpoints
             await context.SaveChangesAsync();
 
             return TypedResults.Ok();
-        }).WithName("UpdateTodoAsync")
-          .Produces(200)
-          .Produces(400)
-          .Produces(404)
-          .ProducesValidationProblem();
+        }).WithName("UpdateTodoAsync");
 
         group.MapDelete("/{id}", async Task<Results<Ok, NotFound>>
             (int id, [FromServices]DataContext context) =>
@@ -123,10 +114,18 @@ public static class TodoEndpoints
             await context.SaveChangesAsync();
 
             return TypedResults.Ok();
-        }).WithName("DeleteTodoAsync")
-          .Produces(200)
-          .Produces(404);
+        }).WithName("DeleteTodoAsync");
 
         return app;
+    }
+
+    private static async Task<TodoItemDTO?> GetTodoAsync(int id, DataContext context)
+    {
+        return await context.Todos.Select(s => new TodoItemDTO
+        {
+            Id = s.Id,
+            Name = s.Name,
+            IsComplete = s.IsComplete,
+        }).SingleOrDefaultAsync(s => s.Id == id);
     }
 }
