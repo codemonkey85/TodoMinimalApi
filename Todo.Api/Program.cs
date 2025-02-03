@@ -31,6 +31,8 @@ try
 
     // Fluent Validation
     services.AddValidators();
+    // API / DB Services
+    services.AddApiServices();
 
     services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

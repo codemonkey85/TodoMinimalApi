@@ -10,6 +10,7 @@ public class AutomapperProfile : Profile
     {
         CreateMap<TodoItem, TodoItemDTO>();
         CreateMap<AddTodo, TodoItem>();
-        CreateMap<UpdateTodo, TodoItem>();
+        CreateMap<UpdateTodo, TodoItem>()
+            .ForMember(f => f.Id, opt => opt.Ignore());
     }
 }
