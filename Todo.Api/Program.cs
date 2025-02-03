@@ -17,6 +17,8 @@ try
     builder.Host.UseSerilog((ctx, lc) => lc
         .ReadFrom.Configuration(ctx.Configuration));
 
+    services.AddProblemDetails();
+
     // Add services to the container.
     string connectionString = builder.Configuration.GetConnectionString("DataContext")
         ?? throw new InvalidOperationException("Unable to retrieve ConnectionString: `DataContext`");
@@ -67,6 +69,21 @@ try
     app.UseHttpsRedirection();
 
     app.MapApiEndpoints();
+
+    // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/handle-errors?view=aspnetcore-9.0#iproblemdetailsservice-fallback
+    app.UseExceptionHandler(exceptionHandlerApp =>
+    {
+        exceptionHandlerApp.Run(async httpContext =>
+        {
+            var pds = httpContext.RequestServices.GetService<IProblemDetailsService>();
+            if (pds == null
+                || !await pds.TryWriteAsync(new() { HttpContext = httpContext }))
+            {
+                // Fallback behavior
+                await httpContext.Response.WriteAsync("Fallback: An error occurred.");
+            }
+        });
+    });
 
     app.Run();
 }

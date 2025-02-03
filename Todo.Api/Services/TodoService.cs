@@ -31,7 +31,7 @@ public class TodoService(DataContext context,
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetAsync), ex.Message);
+            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetAllAsync), ex.Message);
             throw;
         }
     }
@@ -49,7 +49,7 @@ public class TodoService(DataContext context,
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetAsync), ex.Message);
+            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetByIdAsync), ex.Message);
             throw;
         }
     }
@@ -65,7 +65,7 @@ public class TodoService(DataContext context,
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetAsync), ex.Message);
+            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(CreateAsync), ex.Message);
             throw;
         }
     }
@@ -89,7 +89,7 @@ public class TodoService(DataContext context,
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetAsync), ex.Message);
+            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(UpdateAsync), ex.Message);
             throw;
         }
     }
@@ -106,7 +106,7 @@ public class TodoService(DataContext context,
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(GetAsync), ex.Message);
+            _logger.LogError(ex, "{FILENAME} - [{methodName}]: {exMessage}", FILENAME, nameof(DeleteAsync), ex.Message);
             throw;
         }
     }
