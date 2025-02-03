@@ -18,6 +18,7 @@ try
         .ReadFrom.Configuration(ctx.Configuration));
 
     services.AddProblemDetails();
+    services.AddExceptionHandler<CustomExceptionHandler>();
 
     // Add services to the container.
     string connectionString = builder.Configuration.GetConnectionString("DataContext")
@@ -45,6 +46,7 @@ try
     }
 
     var app = builder.Build();
+    using IServiceScope? scope = app.Services.CreateScope();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
@@ -58,8 +60,7 @@ try
 #if DEBUG
         bool seed = app.Configuration.GetValue<bool>("seed");
         if (seed)
-        {
-            using IServiceScope? scope = app.Services.CreateScope();
+        {            
             using DataContext context = scope.ServiceProvider.GetRequiredService<DataContext>();
             DbInit.Seed(context);
         }
@@ -71,19 +72,7 @@ try
     app.MapApiEndpoints();
 
     // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/handle-errors?view=aspnetcore-9.0#iproblemdetailsservice-fallback
-    app.UseExceptionHandler(exceptionHandlerApp =>
-    {
-        exceptionHandlerApp.Run(async httpContext =>
-        {
-            var pds = httpContext.RequestServices.GetService<IProblemDetailsService>();
-            if (pds == null
-                || !await pds.TryWriteAsync(new() { HttpContext = httpContext }))
-            {
-                // Fallback behavior
-                await httpContext.Response.WriteAsync("Fallback: An error occurred.");
-            }
-        });
-    });
+    app.UseExceptionHandler();
 
     app.Run();
 }

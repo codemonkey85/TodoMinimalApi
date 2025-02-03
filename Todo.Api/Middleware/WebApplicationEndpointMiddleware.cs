@@ -9,5 +9,5 @@ public static class WebApplicationEndpointMiddleware
         app.MapTodoEndpoints();
         app.MapWeatherForecastEndpoints();
         return app;
-    }
+    }    
 }

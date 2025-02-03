@@ -40,11 +40,8 @@ public class TodoService(DataContext context,
     {
         try
         {
-            TodoItem? todo = await _context.Todos.FindAsync(id);
-            if (todo is null)
-            {
-                return null;
-            }
+            TodoItem? todo = await _context.Todos.FindAsync(id)
+                ?? throw new KeyNotFoundException($"Unable to find record by ID: `{id}`");
             return _mapper.Map<TodoItemDTO>(todo);
         }
         catch (Exception ex)
