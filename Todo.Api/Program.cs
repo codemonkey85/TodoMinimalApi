@@ -32,6 +32,8 @@ try
     // Fluent Validation
     services.AddValidators();
 
+    services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
     if (builder.Environment.IsDevelopment())
     {
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
