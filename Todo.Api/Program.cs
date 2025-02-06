@@ -55,6 +55,7 @@ try
         {
             options.SwaggerEndpoint("/openapi/v1/openapi.json", "Todo API");
         });
+        app.UseWebAssemblyDebugging();
 
 #if DEBUG
         bool seed = app.Configuration.GetValue<bool>("seed");
