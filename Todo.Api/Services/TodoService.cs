@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using Todo.Api.Contracts;
 using Todo.Api.Data;
 using Todo.Shared.Entities;
@@ -18,15 +20,23 @@ public class TodoService(DataContext context,
     private readonly ILogger<TodoService> _logger = logger;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<List<TodoItemDTO>> GetAllAsync()
+    public async Task<List<TodoItemDTO>> GetAllAsync(SortOrder sortOrder = SortOrder.Descending)
     {
         try
         {
-            var todos = await _context.Todos.ToListAsync();
+            IQueryable<TodoItem> todoQueryable = _context.Todos;
+            todoQueryable = sortOrder switch
+            {
+                SortOrder.Descending => todoQueryable.OrderByDescending(o => o.Id),
+                _ => todoQueryable.OrderBy(o => o.Id),
+            };
+
+            List<TodoItem>? todos = await todoQueryable.ToListAsync();
             if (todos is null || todos.Count == 0)
             {
                 return [];
             }
+
             return _mapper.Map<List<TodoItemDTO>>(todos);
         }
         catch (Exception ex)
