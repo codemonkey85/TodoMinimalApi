@@ -16,10 +16,13 @@ else
 {
     <MudDataGrid Items="@_items" T="TodoItemDTO"
     EditMode="DataGridEditMode.Form" CommittedItemChanges="@CommittedItemChanges"
-    Dense="true" Bordered="false" 
+    Dense="true" Bordered="false"
     ReadOnly="false" EditTrigger="DataGridEditTrigger.Manual">
         <ToolBarContent>
             <MudText Typo="Typo.h3">Todos</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" 
+                Color="Color.Primary"/>
         </ToolBarContent>
         <Columns>
             <PropertyColumn Property="p => p.Name" Title="Name" />
@@ -51,9 +54,6 @@ else
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
-        <PagerContent>
-            <MudDataGridPager T="TodoItemDTO" />
-        </PagerContent>
     </MudDataGrid>
 }
 
