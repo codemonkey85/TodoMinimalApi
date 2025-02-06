@@ -1,0 +1,35 @@
+﻿@inject IJSRuntime _jsRuntime
+@inject NavigationManager uriHelper
+
+@if (_newVersionAvailable)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled"
+     OnClick="@(() => uriHelper.Refresh(forceReload: true))">
+        A new verssion of the application is available. Click here to upgrade.
+    </MudAlert>
+}
+
+@code {
+    private bool _newVersionAvailable = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RegisterForUpdateAvailableNotification();
+    }
+
+    private async Task RegisterForUpdateAvailableNotification()
+    {
+        await _jsRuntime.InvokeAsync<object>(
+            identifier: "registerForUpdateAvailableNotification",
+            DotNetObjectReference.Create(this),
+            nameof(OnUpdateAvailable));
+    }
+
+    [JSInvokable(nameof(OnUpdateAvailable))]
+    public Task OnUpdateAvailable()
+    {
+        _newVersionAvailable = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}
