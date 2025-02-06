@@ -22,24 +22,24 @@ else
             <MudText Typo="Typo.h3">Todos</MudText>
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Add" Variant="Variant.Filled" 
-                Color="Color.Primary"/>
+            Color="Color.Primary"/>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Property="p => p.Name" Title="Name" />
-            <PropertyColumn Property="p => p.IsComplete" Title="Status">
+            <PropertyColumn Property="p => p.Name" Title="Name">
                 <CellTemplate>
                     <MudStack Row>
-                        @if (context.Item.IsComplete)
+                        @if(!context.Item.IsComplete)
                         {
-                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Inherit" />
+                            <MudText Style="text-decoration: line-through;" Typo="Typo.body1">@context.Item.Name</MudText>
                         }
                         else
                         {
-                            <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Inherit" />
+                            <MudText Typo="Typo.body1">@context.Item.Name</MudText>
                         }
-
                     </MudStack>
                 </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="p => p.IsComplete" Title="Status" Hidden="true">
                 <EditTemplate>
                     <MudSwitch @bind-Value="context.Item.IsComplete"
                     Label="Complete?" LabelPlacement="Placement.Start"
