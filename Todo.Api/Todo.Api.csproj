@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Todo.Client\Todo.Client.csproj" />
+    <ProjectReference Include="..\Todo.Shared\Todo.Shared.csproj" />
   </ItemGroup>
 
 </Project>
