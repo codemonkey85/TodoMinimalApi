@@ -5,7 +5,26 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudMainContent>
-        @Body
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit"
+            Edge="Edge.Start" OnClick="@((e) => DrawerToggle(e))" />
+        Todo App
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent Class="mt-3">
+        <MudContainer MaxWidth="MaxWidth.Large">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
+
+@code {
+    bool _drawerOpen = false;
+
+    void DrawerToggle(MouseEventArgs e)
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
