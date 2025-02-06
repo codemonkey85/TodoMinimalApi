@@ -1,7 +1,55 @@
 ﻿@page "/"
+@using Todo.Shared.Entities.DTO.Todo
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager NavigationManager
 
-<PageTitle>@App.SetPageTitle(null)</PageTitle>
+<PageTitle>@App.SetPageTitle("List Todos")</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (todos is null)
+{
+    <MudText Typo="Typo.body1">Loading, please wait...</MudText>
+}
+else
+{
+    <MudDataGrid Items="@todos.Todos" T="TodoItemDTO">
+        <ToolBarContent>
+            <MudText Typo="Typo.h3">Todos</MudText>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="p => p.Name" Title="" />
+            <PropertyColumn Property="p => p.IsComplete" Title="">
+                <CellTemplate>
+                    <MudStack Row>
+                        @if (context.Item.IsComplete)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Inherit" />
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Cancel" Color="Color.Inherit" />
+                        }
 
-Welcome to your new app.
+                    </MudStack>
+                </CellTemplate>
+            </PropertyColumn>
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton OnClick="@(() => NavigationManager.NavigateTo($"/edit/{context.Item.Id}"))" Icon="@Icons.Material.Filled.Edit" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="TodoItemDTO" />
+        </PagerContent>
+    </MudDataGrid>
+}
+
+@code {
+    private ListTodos? todos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var client = ClientFactory.CreateClient("Todo.Api");
+        todos = await client.GetFromJsonAsync<ListTodos>("/api/todos");
+    }
+}
