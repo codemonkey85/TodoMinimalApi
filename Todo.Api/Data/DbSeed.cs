@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Todo.Api.Entities;
+using Todo.Shared.Entities;
 
 namespace Todo.Api.Data;
 

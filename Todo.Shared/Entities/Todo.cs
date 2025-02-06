@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Todo.Api.Entities;
+namespace Todo.Shared.Entities;
 
 public record TodoItem
 {

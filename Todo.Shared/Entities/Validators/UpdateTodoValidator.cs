@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using Todo.Api.Entities.DTO.Todo;
+using Todo.Shared.Entities.DTO.Todo;
 
-namespace Todo.Api.Entities.Validators;
+namespace Todo.Shared.Entities.Validators;
 
 public class UpdateTodoValidator : AbstractValidator<UpdateTodo>
 {

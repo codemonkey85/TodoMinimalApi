@@ -1,4 +1,4 @@
-﻿using Todo.Api.Entities;
+﻿using Todo.Shared.Entities;
 
 namespace Todo.Api.Endpoints;
 

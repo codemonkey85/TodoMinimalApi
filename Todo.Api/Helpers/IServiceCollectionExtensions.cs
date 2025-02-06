@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Todo.Api.Contracts;
-using Todo.Api.Entities.DTO.Todo;
-using Todo.Api.Entities.Validators;
+using Todo.Shared.Entities.DTO.Todo;
+using Todo.Shared.Entities.Validators;
 using Todo.Api.Services;
 
 namespace Todo.Api.Helpers;

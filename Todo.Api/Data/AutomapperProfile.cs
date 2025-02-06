@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Todo.Api.Entities;
-using Todo.Api.Entities.DTO.Todo;
+using Todo.Shared.Entities;
+using Todo.Shared.Entities.DTO.Todo;
 
 namespace Todo.Api.Data;
 

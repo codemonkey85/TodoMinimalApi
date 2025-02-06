@@ -1,4 +1,4 @@
-﻿namespace Todo.Api.Entities.DTO.Todo;
+﻿namespace Todo.Shared.Entities.DTO.Todo;
 
 public class UpdateTodo
 {

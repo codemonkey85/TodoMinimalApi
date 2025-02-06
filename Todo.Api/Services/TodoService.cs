@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Todo.Api.Contracts;
 using Todo.Api.Data;
-using Todo.Api.Entities;
-using Todo.Api.Entities.DTO.Todo;
+using Todo.Shared.Entities;
+using Todo.Shared.Entities.DTO.Todo;
 
 namespace Todo.Api.Services;
 
