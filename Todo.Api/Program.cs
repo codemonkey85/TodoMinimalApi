@@ -1,5 +1,4 @@
 using AspNetCore.Swagger.Themes;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Reflection;
@@ -69,10 +68,17 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseBlazorFrameworkFiles();
+    app.MapStaticAssets();
+    
     app.MapApiEndpoints();
 
     // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/handle-errors?view=aspnetcore-9.0#iproblemdetailsservice-fallback
     app.UseExceptionHandler();
+
+    app.UseRouting();
+
+    app.MapFallbackToFile("index.html");
 
     app.Run();
 }
