@@ -14,7 +14,7 @@ public static class TodoEndpoints
 {
     public static IEndpointRouteBuilder MapTodoEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/todos");
+        var group = app.MapGroup("/api/todos");
 
         group.MapGet("/", async Task<Results<Ok<ListTodos>,Ok>> 
             ([FromServices] ITodoService service) =>

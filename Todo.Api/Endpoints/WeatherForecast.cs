@@ -6,7 +6,7 @@ public static class WeatherForecastEndpoints
 {
     public static IEndpointRouteBuilder MapWeatherForecastEndpoints(this WebApplication app)
     {
-        var weather = app.MapGroup("/weatherforecast");
+        var weather = app.MapGroup("/api/weatherforecast");
 
         var summaries = new[]
         {
