@@ -1,7 +1,10 @@
 ﻿@page "/"
+@using System.Collections.ObjectModel
 @using Todo.Shared.Entities.DTO.Todo
 @inject IHttpClientFactory ClientFactory
+@inject ILogger<Home> Logger
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 <PageTitle>@App.SetPageTitle("List Todos")</PageTitle>
 
@@ -11,13 +14,16 @@
 }
 else
 {
-    <MudDataGrid Items="@todos.Todos" T="TodoItemDTO">
+    <MudDataGrid Items="@_items" T="TodoItemDTO"
+    EditMode="DataGridEditMode.Form" CommittedItemChanges="@CommittedItemChanges"
+    Dense="true" Bordered="false" 
+    ReadOnly="false" EditTrigger="DataGridEditTrigger.Manual">
         <ToolBarContent>
             <MudText Typo="Typo.h3">Todos</MudText>
         </ToolBarContent>
         <Columns>
-            <PropertyColumn Property="p => p.Name" Title="" />
-            <PropertyColumn Property="p => p.IsComplete" Title="">
+            <PropertyColumn Property="p => p.Name" Title="Name" />
+            <PropertyColumn Property="p => p.IsComplete" Title="Status">
                 <CellTemplate>
                     <MudStack Row>
                         @if (context.Item.IsComplete)
@@ -31,10 +37,17 @@ else
 
                     </MudStack>
                 </CellTemplate>
+                <EditTemplate>
+                    <MudSwitch @bind-Value="context.Item.IsComplete"
+                    Label="Complete?" LabelPlacement="Placement.Start"
+                    Color="Color.Primary"/>
+                </EditTemplate>
             </PropertyColumn>
             <TemplateColumn CellClass="d-flex justify-end">
                 <CellTemplate>
-                    <MudIconButton OnClick="@(() => NavigationManager.NavigateTo($"/edit/{context.Item.Id}"))" Icon="@Icons.Material.Filled.Edit" />
+                    <MudIconButton 
+                    OnClick="@context.Actions.StartEditingItemAsync" 
+                    Icon="@Icons.Material.Filled.Edit" Size="@Size.Small"/>
                 </CellTemplate>
             </TemplateColumn>
         </Columns>
@@ -46,10 +59,28 @@ else
 
 @code {
     private ListTodos? todos;
+    private ObservableCollection<TodoItemDTO> _items = [];
 
     protected override async Task OnInitializedAsync()
     {
         using var client = ClientFactory.CreateClient("Todo.Api");
         todos = await client.GetFromJsonAsync<ListTodos>("/api/todos");
+        _items = new(todos!.Todos);
+    }
+
+    async Task CommittedItemChanges(TodoItemDTO item)
+    {
+        Logger.LogInformation($"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        using var client = ClientFactory.CreateClient("Todo.Api");
+        var result = await client.PutAsJsonAsync<TodoItemDTO>($"/api/todos/{item.Id}", item);
+        if (result.IsSuccessStatusCode)
+        {
+            Snackbar.Add("Updated Item.", Severity.Success);
+            _items.ReplaceItem(r => r.Id == item.Id, item);
+        }
+        else
+        {
+            Snackbar.Add("Error updating item.", Severity.Error);
+        }
     }
 }

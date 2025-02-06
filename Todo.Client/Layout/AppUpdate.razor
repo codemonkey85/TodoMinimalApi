@@ -1,7 +1,8 @@
 ﻿@inject IJSRuntime _jsRuntime
 @inject NavigationManager uriHelper
+@inject IWebAssemblyHostEnvironment Env
 
-@if (_newVersionAvailable)
+@if (_newVersionAvailable && !Env.IsDevelopment())
 {
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled"
      OnClick="@(() => uriHelper.Refresh(forceReload: true))">
@@ -14,7 +15,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await RegisterForUpdateAvailableNotification();
+        if (!Env.IsDevelopment())
+        {
+            await RegisterForUpdateAvailableNotification();
+        }
     }
 
     private async Task RegisterForUpdateAvailableNotification()
