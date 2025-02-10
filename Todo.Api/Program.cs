@@ -69,6 +69,7 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseSerilogIngestion();
     app.UseSerilogRequestLogging();
 
     app.UseBlazorFrameworkFiles();
