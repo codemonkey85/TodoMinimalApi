@@ -1,0 +1,70 @@
+﻿@inject IHttpClientFactory ClientFactory
+@inject ILogger<_DataGridDeleteDialog> Logger
+@inject ISnackbar Snackbar
+
+@if (Todo is not null)
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.DeleteForever" Class="mr-3 mb-n1" />
+                Delete Todo?
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudAlert Severity="Severity.Warning">
+                Warning! This can't be undone!
+            </MudAlert>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.Close"
+            Variant="Variant.Filled">
+                No Way!
+            </MudButton>
+            <MudButton Disabled="@_processing" Color="Color.Error" StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled"
+            OnClick="@(async() => await DeleteItemAsync(Todo))">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Deleting, please wait...</MudText>
+                }
+                else
+                {
+                    <MudText>I Understand</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+
+    [Parameter, EditorRequired]
+    public TodoItemDTO? Todo { get; set; }
+
+    private bool _processing = false;
+
+    private void Cancel() => MudDialog!.Cancel();
+
+    async Task DeleteItemAsync(TodoItemDTO item)
+    {
+        Logger.LogInformation($"Event = DeleteItemAsync, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+
+        _processing = true;
+        using var client = ClientFactory.CreateClient("Todo.Api");
+        var result = await client.DeleteAsync($"/api/todos/{item.Id}");
+        if (result.IsSuccessStatusCode)
+        {
+            _processing = false;
+            Snackbar.Add("Deleted Item.", Severity.Success);
+            MudDialog!.Close(DialogResult.Ok(item.Id));
+        }
+        else
+        {
+            Snackbar.Add("Error deleting item.", Severity.Error);
+            MudDialog!.Close(DialogResult.Cancel());
+        }
+    }
+}

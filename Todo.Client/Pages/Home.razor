@@ -2,6 +2,7 @@
 @using System.Collections.ObjectModel
 @using Todo.Shared.Entities.DTO.Todo
 @inject IHttpClientFactory ClientFactory
+@inject IDialogService DialogService
 @inject ILogger<Home> Logger
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
@@ -50,9 +51,9 @@ else
                 <CellTemplate>
                     <MudStack Row>
                         <MudIconButton OnClick="@context.Actions.StartEditingItemAsync"
-                                       Icon="@Icons.Material.Filled.Edit" Size="@Size.Small" />
+                        Icon="@Icons.Material.Filled.Edit" Size="@Size.Small" />
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="@Size.Small"
-                                       Color="Color.Error" OnClick="@(async() => await DeleteItemAsync(context.Item))"/>
+                        Color="Color.Error" OnClick="@(async() => await DeleteItemAsync(context.Item))"/>
                     </MudStack>
                 </CellTemplate>
             </TemplateColumn>
@@ -73,17 +74,14 @@ else
 
     async Task DeleteItemAsync(TodoItemDTO item)
     {
-        Logger.LogInformation($"Event = DeleteItemAsync, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
-        using var client = ClientFactory.CreateClient("Todo.Api");
-        var result = await client.DeleteAsync($"/api/todos/{item.Id}");
-        if (result.IsSuccessStatusCode)
+        var parameters = new DialogParameters<_DataGridDeleteDialog> { { x => x.Todo, item } };
+
+        var dialog = await DialogService.ShowAsync<_DataGridDeleteDialog>("Delete Todo", parameters);
+        var result = await dialog.Result;
+
+        if (!result!.Canceled)
         {
-            Snackbar.Add("Deleted Item.", Severity.Success);
             _items.Remove(item);
-        }
-        else
-        {
-            Snackbar.Add("Error updating item.", Severity.Error);
         }
     }
 
