@@ -69,6 +69,8 @@ try
 
     app.UseHttpsRedirection();
 
+    app.UseSerilogRequestLogging();
+
     app.UseBlazorFrameworkFiles();
     app.MapStaticAssets();
     
