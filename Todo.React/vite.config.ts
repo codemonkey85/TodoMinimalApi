@@ -1,11 +1,34 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import mkcert from'vite-plugin-mkcert'
+import basicSsl from '@vitejs/plugin-basic-ssl'
+import { fileURLToPath } from "url";
+
+const baseFolder =
+    process.env.APPDATA !== undefined && process.env.APPDATA !== ''
+        ? `${process.env.APPDATA}/ASP.NET/https`
+        : `${process.env.HOME}/.aspnet/https`;
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), mkcert()],
+  //  define: { API_URL: `"${apiUrl}"` },
+  plugins: [react(), basicSsl(
+    {
+      name: 'todo-react',
+      certDir: baseFolder
+    }
+  )],
+  resolve: {
+    alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+    }
+  },
   server: {
-    https: true
+    proxy: {
+        '^/api': {
+            target: "https://localhost:7128/api",
+            secure: true
+        }
+    },
+    port: 5173,
   }
 })
