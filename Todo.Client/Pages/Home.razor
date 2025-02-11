@@ -1,11 +1,4 @@
 ﻿@page "/"
-@using System.Collections.ObjectModel
-@using Todo.Shared.Entities.DTO.Todo
-@inject IHttpClientFactory ClientFactory
-@inject IDialogService DialogService
-@inject ILogger<Home> Logger
-@inject NavigationManager NavigationManager
-@inject ISnackbar Snackbar
 
 <PageTitle>@App.SetPageTitle("List Todos")</PageTitle>
 
@@ -59,45 +52,4 @@ else
             </TemplateColumn>
         </Columns>
     </MudDataGrid>
-}
-
-@code {
-    private ListTodos? todos;
-    private ObservableCollection<TodoItemDTO> _items = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        using var client = ClientFactory.CreateClient("Todo.Api");
-        todos = await client.GetFromJsonAsync<ListTodos>("/api/todos");
-        _items = new(todos!.Todos);
-    }
-
-    async Task DeleteItemAsync(TodoItemDTO item)
-    {
-        var parameters = new DialogParameters<_DataGridDeleteDialog> { { x => x.Todo, item } };
-
-        var dialog = await DialogService.ShowAsync<_DataGridDeleteDialog>("Delete Todo", parameters);
-        var result = await dialog.Result;
-
-        if (!result!.Canceled)
-        {
-            _items.Remove(item);
-        }
-    }
-
-    async Task CommittedItemChanges(TodoItemDTO item)
-    {
-        Logger.LogInformation($"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
-        using var client = ClientFactory.CreateClient("Todo.Api");
-        var result = await client.PutAsJsonAsync<TodoItemDTO>($"/api/todos/{item.Id}", item);
-        if (result.IsSuccessStatusCode)
-        {
-            Snackbar.Add("Updated Item.", Severity.Success);
-            _items.ReplaceItem(r => r.Id == item.Id, item);
-        }
-        else
-        {
-            Snackbar.Add("Error updating item.", Severity.Error);
-        }
-    }
 }
