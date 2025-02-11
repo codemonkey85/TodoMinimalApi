@@ -1,0 +1,71 @@
+﻿@inject IHttpClientFactory ClientFactory
+@inject ILogger<_DataGridEditDialog> Logger
+@inject ISnackbar Snackbar
+
+@if (Todo is not null)
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                <MudIcon Icon="@Icons.Material.Filled.EditNote" Class="mr-3 mb-n1" />
+                Edit Todo
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField @bind-Value="Todo.Name" Label="Name" />
+            <MudSwitch @bind-Value="Todo.IsComplete"
+                       Label="Complete?" LabelPlacement="Placement.Start"
+                       Color="Color.Primary" />
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.Close"
+                       Variant="Variant.Filled">
+                Cancel
+            </MudButton>
+            <MudButton Disabled="@_processing" Color="Color.Error" StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled"
+                       OnClick="@(async() => await EditItemAsync(Todo))">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Processing, please wait...</MudText>
+                }
+                else
+                {
+                    <MudText>Update</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+
+    [Parameter, EditorRequired]
+    public TodoItemDTO? Todo { get; set; }
+
+    private bool _processing = false;
+
+    private void Cancel() => MudDialog!.Cancel();
+
+    async Task EditItemAsync(TodoItemDTO item)
+    {
+        Logger.LogInformation("Event = {eventName}, Data = {data}", nameof(EditItemAsync), System.Text.Json.JsonSerializer.Serialize(item));
+
+        _processing = true;
+        using var client = ClientFactory.CreateClient("Todo.Api");
+        var result = await client.PutAsJsonAsync<TodoItemDTO>($"/api/todos/{item.Id}", item);
+        if (result.IsSuccessStatusCode)
+        {
+            _processing = false;
+            Snackbar.Add("Updated Item.", Severity.Success);
+            MudDialog!.Close(DialogResult.Ok(item.Id));
+        }
+        else
+        {
+            Snackbar.Add("Error updating item.", Severity.Error);
+            MudDialog!.Close(DialogResult.Cancel());
+        }
+    }
+}

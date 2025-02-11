@@ -41,19 +41,16 @@ public partial class Home(
         }
     }
 
-    async Task CommittedItemChanges(TodoItemDTO item)
+    async Task EditItemAsync(TodoItemDTO item)
     {
-        _logger.LogInformation("Event = {eventName}, Data = {data}", nameof(CommittedItemChanges), System.Text.Json.JsonSerializer.Serialize(item));
-        using var client = _httpClientFactory.CreateClient("Todo.Api");
-        HttpResponseMessage result = await client.PutAsJsonAsync($"/api/todos/{item.Id}", item);
-        if (result.IsSuccessStatusCode)
+        var parameters = new DialogParameters<_DataGridEditDialog> { { x => x.Todo, item } };
+
+        var dialog = await _dialogService.ShowAsync<_DataGridEditDialog>("Edit Todo", parameters);
+        var result = await dialog.Result;
+
+        if (!result!.Canceled)
         {
-            _snackbarService.Add("Updated Item.", Severity.Success);
             _items.ReplaceItem(r => r.Id == item.Id, item);
-        }
-        else
-        {
-            _snackbarService.Add("Error updating item.", Severity.Error);
         }
     }
 }
