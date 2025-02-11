@@ -50,7 +50,7 @@
 
     async Task DeleteItemAsync(TodoItemDTO item)
     {
-        Logger.LogInformation($"Event = DeleteItemAsync, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+        Logger.LogInformation("Event = {eventName}, Data = {data}", nameof(DeleteItemAsync), System.Text.Json.JsonSerializer.Serialize(item));
 
         _processing = true;
         using var client = ClientFactory.CreateClient("Todo.Api");

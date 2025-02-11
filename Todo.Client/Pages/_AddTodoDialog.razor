@@ -1,0 +1,64 @@
+﻿@inject IHttpClientFactory ClientFactory
+@inject ILogger<_AddTodoDialog> Logger
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-3 mb-n1" />
+            New Todo
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="Todo!.Name" Label="Name" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.Close"
+        Variant="Variant.Filled">
+            Cancel
+        </MudButton>
+        <MudButton Disabled="@_processing" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled"
+        OnClick="@(async() => await AddItemAsync())">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Processing, please wait...</MudText>
+            }
+            else
+            {
+                <MudText>Add</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+
+    public TodoItemDTO? Todo { get; set; } = new();
+
+    private bool _processing = false;
+
+    private void Cancel() => MudDialog!.Cancel();
+
+    async Task AddItemAsync()
+    {
+        Logger.LogInformation("Event = {eventName}, Data = {data}", nameof(AddItemAsync), System.Text.Json.JsonSerializer.Serialize(Todo));
+
+        _processing = true;
+        using var client = ClientFactory.CreateClient("Todo.Api");
+        var result = await client.PostAsJsonAsync($"/api/todos", Todo);
+        if (result.IsSuccessStatusCode)
+        {
+            _processing = false;
+            Snackbar.Add("Added Item.", Severity.Success);
+            MudDialog!.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Snackbar.Add("Error adding item.", Severity.Error);
+            MudDialog!.Close(DialogResult.Cancel());
+        }
+    }
+}

@@ -28,6 +28,19 @@ public partial class Home(
         _items = new(todos!.Todos);
     }
 
+    async Task CreateItemAsync()
+    {
+        var dialog = await _dialogService.ShowAsync<_AddTodoDialog>("Add Todo");
+        var result = await dialog.Result;
+        if (!result!.Canceled)
+        {
+            using var client = _httpClientFactory.CreateClient("Todo.Api");
+            todos = await client.GetFromJsonAsync<ListTodos>("/api/todos");
+            _items = new(todos!.Todos);
+            StateHasChanged();
+        }
+    }
+
     async Task DeleteItemAsync(TodoItemDTO item)
     {        
         var parameters = new DialogParameters<_DataGridDeleteDialog> { { x => x.Todo, item } };

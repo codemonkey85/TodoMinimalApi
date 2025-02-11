@@ -22,7 +22,7 @@
                        Variant="Variant.Filled">
                 Cancel
             </MudButton>
-            <MudButton Disabled="@_processing" Color="Color.Error" StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled"
+            <MudButton Disabled="@_processing" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled"
                        OnClick="@(async() => await EditItemAsync(Todo))">
                 @if (_processing)
                 {
