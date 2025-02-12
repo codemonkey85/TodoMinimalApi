@@ -1,34 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
+import { IWeatherForecast } from './models'
+import { up, isResponseError } from 'up-fetch'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const upfetch = up(fetch, () => ({
+    baseUrl: __API_URL__
+  }))
+  const [forecasts, setForecasts] = useState<IWeatherForecast[]>([])
+  
+  useEffect(() => {
+    const fetchForecasts = async () => {
+      try {
+        const data = await upfetch('/api/weatherforecast')
+        setForecasts(data)
+        console.log(data)
+      } catch (error) {
+        if (isResponseError(error)) {
+            console.log(error.status)
+        }
+      }
+    }
 
+    fetchForecasts()
+  }, [])
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <ul>
+      {forecasts.map((forecast) => (
+        <li key={forecast.temperatureC}>
+          {forecast.summary}
+        </li>
+      ))}
+    </ul>
   )
 }
 

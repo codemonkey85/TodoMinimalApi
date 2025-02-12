@@ -1,12 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import basicSsl from '@vitejs/plugin-basic-ssl'
 import { fileURLToPath } from "url";
-
-const baseFolder =
-    process.env.APPDATA !== undefined && process.env.APPDATA !== ''
-        ? `${process.env.APPDATA}/ASP.NET/https`
-    : `${process.env.HOME}/.aspnet/https`;
         
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -15,12 +9,7 @@ export default defineConfig(({ mode }) => {
   return {
     define:
       { __API_URL__: JSON.stringify(env.VITE_API_URL) },
-    plugins: [react(), basicSsl(
-      {
-        name: 'todo-react',
-        certDir: baseFolder
-      }
-    )],
+    plugins: [react()],
     resolve: {
       alias: {
           '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -29,8 +18,10 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
           '^/api': {
-              target: `${env.VITE_API_URL}/api`,
-              secure: true
+              target: env.VITE_API_URL,
+              secure: mode === 'development' ? false : true,
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/api/, '')
           }
       },
       port: 5173,
