@@ -41,8 +41,16 @@ try
     if (builder.Environment.IsDevelopment())
     {
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        services.AddOpenApi();
+        services.AddOpenApi();        
     }
+
+    services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policy =>
+        {
+            policy.WithOrigins("https://localhost:5173");
+        });
+    });
 
     var app = builder.Build();
     using IServiceScope? scope = app.Services.CreateScope();

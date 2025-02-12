@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
           '^/api': {
-              target: "https://localhost:7128/api",
+              target: `${env.VITE_API_URL}/api`,
               secure: true
           }
       },
