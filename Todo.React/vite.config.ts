@@ -7,12 +7,21 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler', // or "modern"
+          silenceDeprecations: ['mixed-decls', 'color-functions', 'global-builtin', 'import']
+        }
+      }
+    },
     define:
       { __API_URL__: JSON.stringify(env.VITE_API_URL) },
     plugins: [react()],
     resolve: {
       alias: {
-          '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '~bootstrap': fileURLToPath(new URL('./node_modules/bootstrap', import.meta.url))
       }
     },
     server: {
