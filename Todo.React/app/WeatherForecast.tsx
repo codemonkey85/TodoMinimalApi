@@ -1,24 +1,11 @@
-import { type IWeatherForecast, WeatherForecastListSchema } from './models'
-import { up } from 'up-fetch'
-import { useQuery } from '@tanstack/react-query'
+import { type IWeatherForecast } from './models'
 
-function WeatherForecast() {
-  const upfetch = up(fetch, () => ({
-    baseUrl: __API_URL__
-  }))
+type FuncParams = {
+  forecasts: IWeatherForecast[]
+}
 
-  const { isPending, error, data } = useQuery<IWeatherForecast[]>({
-    queryKey: ['weatherForecasts'],
-    queryFn: async () => {
-      const data = await upfetch('/api/weatherforecast', { schema: WeatherForecastListSchema })
-      return data
-    }
-  })
-
-  if (isPending) return 'Loading...'
-
-  if (error) return 'An error has occurred: ' + error.message
-  
+export default function WeatherForecast(params: FuncParams) {
+  const { forecasts } = params;
   return (
     <table>
       <thead>
@@ -30,7 +17,7 @@ function WeatherForecast() {
         </tr>
       </thead>
       <tbody>
-        {data.map((forecast) => (
+        {forecasts.map((forecast) => (
           <tr key={forecast.id}>
             <td>{new Date(forecast.date).toLocaleString()}</td>
             <td>{forecast.temperatureC}</td>
@@ -42,5 +29,3 @@ function WeatherForecast() {
     </table>
   )
 }
-
-export default WeatherForecast
