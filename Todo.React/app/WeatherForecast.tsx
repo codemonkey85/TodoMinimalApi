@@ -1,4 +1,4 @@
-import { IWeatherForecast, WeatherForecastListSchema } from './models'
+import { type IWeatherForecast, WeatherForecastListSchema } from './models'
 import { up } from 'up-fetch'
 import { useQuery } from '@tanstack/react-query'
 

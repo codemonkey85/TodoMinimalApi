@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react-swc'
 import { fileURLToPath } from "url";
+import tsconfigPaths from "vite-tsconfig-paths";
+import { reactRouter } from "@react-router/dev/vite";
         
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -17,7 +18,7 @@ export default defineConfig(({ mode }) => {
     },
     define:
       { __API_URL__: JSON.stringify(env.VITE_API_URL) },
-    plugins: [react()],
+    plugins: [reactRouter(), tsconfigPaths()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
