@@ -12,33 +12,28 @@ namespace Todo.Api.Endpoints;
 
 public static class TodoEndpoints
 {
-    public static IEndpointRouteBuilder MapTodoEndpoints(this WebApplication app)
+    public static object MapTodoEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/api/todos");
 
         group.MapGet("/", async Task<Results<Ok<ListTodos>,Ok>> 
             ([FromServices] ITodoService service) =>
         {
-            var todos = await service.GetAllAsync();
+            return await service.GetAllAsync()
+                 is List<TodoItemDTO> todoItems && todoItems.Count > 0
+                    ? TypedResults.Ok(new ListTodos(todoItems, todoItems.Count))
+                    : TypedResults.Ok();
 
-            if (todos is null || todos.Count == 0)
-            {
-                return TypedResults.Ok();
-            }
-
-            var list = new ListTodos(todos, todos.Count);
-            return TypedResults.Ok<ListTodos>(list);
         }).WithName("GetTodosAsync");
 
         group.MapGet("/{id}", async Task<Results<Ok<TodoItemDTO>, NotFound>> 
             (int id, 
             [FromServices] ITodoService service) =>
         {
-            var todo = await service.GetByIdAsync(id);
-
-            return await service.GetByIdAsync(id) is not null
-                ? TypedResults.Ok<TodoItemDTO>(todo)
-                : TypedResults.NotFound();
+            return await service.GetByIdAsync(id) 
+                is TodoItemDTO todo
+                    ? TypedResults.Ok<TodoItemDTO>(todo)
+                    : TypedResults.NotFound();
 
         }).WithName("GetByIdAsync");
 
